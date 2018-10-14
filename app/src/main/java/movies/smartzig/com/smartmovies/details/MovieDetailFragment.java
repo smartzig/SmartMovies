@@ -34,14 +34,14 @@ import movies.smartzig.com.smartmovies.utils.MovieUtils;
 
 public class MovieDetailFragment extends Fragment {
 
-        public static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
+        private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
 
         private SharedPreferences mPrefs;
 
         private MovieItem mMovie;
         private boolean isFavorite;
 
-        public static ArrayList<MovieItem> favoriteList;   //This is updated favorite movie list
+        private static ArrayList<MovieItem> favoriteList;   //This is updated favorite movie list
 
         @BindView(R.id.movie_title)
         TextView mMovieTitleView;
@@ -123,10 +123,7 @@ public class MovieDetailFragment extends Fragment {
 
             return rootView;
         }
-        @Override
-        public void onSaveInstanceState(@NonNull Bundle outState) {
-            super.onSaveInstanceState(outState);
-        }
+
 
         @Override
         public void onResume() {

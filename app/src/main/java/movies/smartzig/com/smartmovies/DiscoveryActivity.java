@@ -40,7 +40,7 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     private  RecyclerView mRecyclerView;
 
     private SharedPreferences mPrefs;
-    public static List<MovieItem> favoriteList;
+    private static List<MovieItem> favoriteList;
 
     private ProgressBar mLoadingIndicator;
 
@@ -152,7 +152,7 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     }
 
 
-    private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
+    private final BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
         @Override

@@ -1,3 +1,4 @@
+//noinspection GradleCompatible
 apply plugin: 'com.android.application'
 
 android {
@@ -27,10 +28,10 @@ dependencies {
 
 
     /** importing ReciclerView lib because it's better! */
-    implementation 'com.android.support:recyclerview-v7:+'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
 
    /** importing Gson lib to convert Gson to Pojos*/
-    implementation 'com.google.code.gson:gson:2.8.0'
+    implementation 'com.google.code.gson:gson:2.8.5'
 
     /** importing Picasso lib to work with images*/
     implementation 'com.squareup.picasso:picasso:2.71828'

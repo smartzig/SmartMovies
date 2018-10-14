@@ -45,7 +45,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
     }
 
-    protected void checkBuildVersion(){
+    private void checkBuildVersion(){
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().setStatusBarColor(Color.TRANSPARENT);
         }

@@ -10,19 +10,19 @@ public class MovieItem  implements Parcelable {
 
 
     @SerializedName("id")
-    private Long id;
+    private final Long id;
     @SerializedName("vote_average")
-    private String voteAverage;
+    private final String voteAverage;
     @SerializedName("original_title")
-    private String originalTitle;
+    private final String originalTitle;
     @SerializedName("backdrop_path")
-    private String backdropPath;
+    private final String backdropPath;
     @SerializedName("overview")
-    private String overview;
+    private final String overview;
     @SerializedName("release_date")
-    private String releaseDate;
+    private final String releaseDate;
     @SerializedName("poster_path")
-    private String posterPath;
+    private final String posterPath;
 
 
     private MovieItem(Parcel in){
@@ -66,10 +66,6 @@ public class MovieItem  implements Parcelable {
     //Getter Methods
     public Long getId() {
         return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public String getVoteAverage() {
