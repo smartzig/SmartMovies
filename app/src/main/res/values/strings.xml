@@ -1,0 +1,29 @@
+<resources>
+    <string name="app_name">SmartMovies</string>
+    <string name="pref_key">movie_prefs</string>
+    <string name="description">Movie</string>
+
+    <string name="title_top_rated">Top Rated</string>
+    <string name="title_popular">Popular</string>
+    <!--Favorites-->
+    <string name="tittle_favorites">Favorites</string>
+
+    <string name="add_to_favorites">Add to Favorite</string>
+
+
+    <!--Rating-->
+    <string name="movie_rating">Rating: %1$s/10</string>
+
+
+
+
+
+    <string name="error_message">
+        An error has occurred. Please try again by clicking REFRESH
+    </string>
+    <string name="original_tittle">Original tittle</string>
+    <string name="poster">Poster</string>
+    <string name="released">Released</string>
+    <string name="no_favorite_message">No Favorite Movies Found</string>
+    <string name="movie_backdrop">movie_backdrop</string>
+</resources>
