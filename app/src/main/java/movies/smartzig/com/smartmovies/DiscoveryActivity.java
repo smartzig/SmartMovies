@@ -34,10 +34,10 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     private static final String SEARCH_POPULAR = "popular";
     private static final String SEARCH_FAVORITE = "favorite";
 
-    private  TextView mErrorMessageDisplay;
-    private  TextView mNoFavoriteMessageDisplay;
-    private  MovieAdapter mMovieAdapter;
-    private  RecyclerView mRecyclerView;
+    private TextView mErrorMessageDisplay;
+    private TextView mNoFavoriteMessageDisplay;
+    private MovieAdapter mMovieAdapter;
+    private RecyclerView mRecyclerView;
 
     private SharedPreferences mPrefs;
     private static List<MovieItem> favoriteList;
@@ -46,13 +46,14 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
 
 
     private String searchTypeHandler;
+
     @SuppressLint("RestrictedApi")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_discovery);
 
-        if(getSupportActionBar() !=null) {
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setElevation(0f);
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.smartGreen)));
         }
@@ -73,7 +74,7 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
         /*
          * Progress Bar that will tell the user when we are loading data.
          */
-        mLoadingIndicator =  findViewById(R.id.pb_loading_indicator);
+        mLoadingIndicator = findViewById(R.id.pb_loading_indicator);
 
         int gridColsNumber = this.getResources()
                 .getInteger(R.integer.number_of_grid_columns);
@@ -108,14 +109,12 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     }
 
 
-
     @Override
     public void onResume() {
         super.onResume();
         favoriteList = MovieUtils.getFavoriteListFromPrefs(mPrefs);
 
-        if(favoriteList.isEmpty())
-        {
+        if (favoriteList.isEmpty()) {
             refresh(searchTypeHandler);
         }
     }
@@ -123,14 +122,13 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     /**
      * This method will refresh the information
      */
-    private void refresh(String sort_by) {
+    private void refresh(String sortBy) {
         showMovieView();
 
-        if(sort_by.equals(SEARCH_FAVORITE))
-        {
+        if (sortBy.equals(SEARCH_FAVORITE)) {
             handleMovieData(favoriteList);
-        }else{
-            new FetchMovieListTask().execute(sort_by);
+        } else {
+            new FetchMovieListTask().execute(sortBy);
         }
 
     }
@@ -144,10 +142,8 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     @Override
     public void onClick(MovieItem movie) {
 
-        Context context = this;
-        Class destinationClass = MovieDetailActivity.class;
-        Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-       intentToStartDetailActivity.putExtra("MOVIE", movie);
+        Intent intentToStartDetailActivity = new Intent(this, MovieDetailActivity.class);
+        intentToStartDetailActivity.putExtra("MOVIE", movie);
         startActivity(intentToStartDetailActivity);
     }
 
@@ -183,19 +179,17 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     private void handleMovieData(List<MovieItem> movieData) {
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if(searchTypeHandler.equals(SEARCH_FAVORITE) && favoriteList.isEmpty())
-        {
+        if (searchTypeHandler.equals(SEARCH_FAVORITE) && favoriteList.isEmpty()) {
             showNoFavoriteMessage();
-        }
-        else if (movieData != null) {
+        } else if (movieData != null) {
             showMovieView();
             mMovieAdapter.setMovieData(movieData);
         } else {
-                showErrorMessage();
+            showErrorMessage();
         }
     }
 
-    private  void showMovieView() {
+    private void showMovieView() {
         /* First, make sure the error is invisible */
         mErrorMessageDisplay.setVisibility(View.INVISIBLE);
         mNoFavoriteMessageDisplay.setVisibility(View.INVISIBLE);
@@ -235,17 +229,16 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
                 return null;
             }
             try {
-            String preferedSearchMethod = params[0];
+                String preferedSearchMethod = params[0];
 
                 URL movieDbRequestUrl = NetworkUtils.buildUrl(preferedSearchMethod);
 
 
-                    String jsonMovieResponse = NetworkUtils
-                            .getResponseFromHttpUrl(movieDbRequestUrl);
+                String jsonMovieResponse = NetworkUtils
+                        .getResponseFromHttpUrl(movieDbRequestUrl);
 
-                    return MovieUtils
-                            .getMoviesStringFromJson(jsonMovieResponse);
-
+                return MovieUtils
+                        .getMoviesStringFromJson(jsonMovieResponse);
 
 
             } catch (Exception e) {

@@ -41,7 +41,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
      * @param clickHandler The on-click handler for this adapter. This single handler is called
      *                     when an item is clicked.
      */
-    public MovieAdapter(MovieAdapterOnClickHandler clickHandler) {
+    MovieAdapter(MovieAdapterOnClickHandler clickHandler) {
         mClickHandler = clickHandler;
     }
 
@@ -114,11 +114,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MovieAdapter
 
         final MovieItem movieBinded = mMovieData.get(position);
 
-    //    movieAdapterViewHolder.mMovieTittleTextView.setText(movieBinded.getTitle());
-      //  movieAdapterViewHolder.mReleaseDateTextView.setText(movieBinded.getReleaseDate());
-       // movieAdapterViewHolder.mVoteAverageTextView.setText(movieBinded.getVoteAverage().toString());
-
-        String posterUrl = movieBinded.getPosterPath();
+           String posterUrl = movieBinded.getPosterPath();
 
         // Warning: onError() will not be called, if url is null.
         // Empty url leads to app crash.
