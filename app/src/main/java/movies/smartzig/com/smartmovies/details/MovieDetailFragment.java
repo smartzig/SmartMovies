@@ -2,8 +2,7 @@ package movies.smartzig.com.smartmovies.details;
 
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -22,26 +21,25 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.BindViews;
 import butterknife.ButterKnife;
 import movies.smartzig.com.smartmovies.R;
+import movies.smartzig.com.smartmovies.data.MovieDbHelper;
 import movies.smartzig.com.smartmovies.utils.MovieItem;
-import movies.smartzig.com.smartmovies.utils.MovieUtils;
 
 public class MovieDetailFragment extends Fragment {
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
     private static final String MOVIE_KEY = "MOVIE";
-    private SharedPreferences mPrefs;
+
 
     private MovieItem mMovie;
     private boolean isFavorite;
 
-    private static ArrayList<MovieItem> favoriteList;   //This is updated favorite movie list
+    private static List<MovieItem> favoriteList;   //This is updated favorite movie list
 
     @BindView(R.id.movie_title)
     TextView mMovieTitleView;
@@ -57,6 +55,9 @@ public class MovieDetailFragment extends Fragment {
     @BindViews({R.id.user_rating_first_star, R.id.user_rating_second_star, R.id.user_rating_third_star, R.id.user_rating_fourth_star, R.id.user_rating_fifth_star})
     List<ImageView> ratingStarViews;
 
+    private MovieDbHelper dbHelper;
+    private SQLiteDatabase mDb;
+
     public MovieDetailFragment() {
 
     }
@@ -70,14 +71,19 @@ public class MovieDetailFragment extends Fragment {
             mMovie = getArguments().getParcelable(MOVIE_KEY);
         }
 
-        mPrefs = this.getActivity().getSharedPreferences(this.getResources().getString(R.string.pref_key), Context.MODE_PRIVATE);
+        // Create a DB helper (this will create the DB if run for the first time)
+        dbHelper = new MovieDbHelper(this.getContext());
+
+        // Keep a reference to the mDb until paused or killed. Get a writable database
+        mDb = dbHelper.getWritableDatabase();
+
         checkIsFavorite();
         setHasOptionsMenu(true);
     }
 
     private void checkIsFavorite() {
 
-        favoriteList = MovieUtils.getFavoriteListFromPrefs(mPrefs);
+        favoriteList = dbHelper.fetchAllMovies(mDb);
         isFavorite = favoriteList.contains(mMovie);
 
     }
@@ -170,15 +176,14 @@ public class MovieDetailFragment extends Fragment {
 
 
         if (!isFavorite) {
-            favoriteList.add(mMovie);
+            dbHelper.insertMovie(mDb,mMovie);
+
 
         } else {
             favoriteList.remove(mMovie);
-
+            dbHelper.deleteMovie(mDb,mMovie.getId());
         }
 
-        /* use database on the next version */
-        MovieUtils.setFavoriteListIntoPrefs(mPrefs, favoriteList);
         checkIsFavorite();
     }
 

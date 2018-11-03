@@ -6,16 +6,13 @@
     <string name="title_top_rated">Top Rated</string>
     <string name="title_popular">Popular</string>
     <!--Favorites-->
-    <string name="tittle_favorites">Favorites</string>
+    <string name="title_favorites">Favorites</string>
 
     <string name="add_to_favorites">Add to Favorite</string>
 
 
     <!--Rating-->
     <string name="movie_rating">Rating: %1$s/10</string>
-
-
-
 
 
     <string name="error_message">
@@ -26,4 +23,22 @@
     <string name="released">Released</string>
     <string name="no_favorite_message">No Favorite Movies Found</string>
     <string name="movie_backdrop">movie_backdrop</string>
+    <string name="action_settings">Settings</string>
+
+
+    <!-- - - - - - - - - - - -->
+    <!--Used by Preferences  -->
+    <!-- - - - - - - - - - - -->
+    <string name="pref_default_search" translatable="false">top_rated</string>
+
+    <string name="pref_search_top_rated" translatable="false">top_rated</string>
+    <string name="pref_search_popular" translatable="false">popular</string>
+    <string name="pref_search_favorite" translatable="false">favorite</string>
+
+
+
+    <string name="pref_search_key" translatable="false">SEARCH_METHOD</string>
+
+    <string name="pref_search_label" translatable="false">Favorite Search Method</string>
+
 </resources>

@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.google.gson.annotations.SerializedName;
 
-public class MovieItem  implements Parcelable {
+public class MovieItem implements Parcelable {
 
 
     @SerializedName("id")
@@ -24,8 +24,18 @@ public class MovieItem  implements Parcelable {
     @SerializedName("poster_path")
     private final String posterPath;
 
+    public MovieItem(Long id, String backdropPath, String originalTitle, String voteAverage, String overview,  String posterPath, String releaseDate) {
+        this.id = id;
+        this.voteAverage = voteAverage;
+        this.originalTitle = originalTitle;
+        this.backdropPath = backdropPath;
+        this.overview = overview;
+        this.releaseDate = releaseDate;
+        this.posterPath = posterPath;
 
-    private MovieItem(Parcel in){
+    }
+
+    private MovieItem(Parcel in) {
         id = in.readLong();
         voteAverage = in.readString();
         originalTitle = in.readString();
@@ -78,9 +88,9 @@ public class MovieItem  implements Parcelable {
 
     public String getBackdropPath() {
         if (backdropPath != null && !backdropPath.isEmpty()) {
-            if(!backdropPath.toLowerCase().contains("http://")){
+            if (!backdropPath.toLowerCase().contains("http://")) {
                 return "http://image.tmdb.org/t/p/original" + backdropPath;
-            }else{
+            } else {
                 return backdropPath;
             }
 
@@ -101,9 +111,9 @@ public class MovieItem  implements Parcelable {
     public String getPosterPath() {
         if (posterPath != null && !posterPath.isEmpty()) {
 
-            if(!posterPath.toLowerCase().contains("http://")){
+            if (!posterPath.toLowerCase().contains("http://")) {
                 return "http://image.tmdb.org/t/p/w342" + posterPath;
-            }else{
+            } else {
                 return posterPath;
             }
 
@@ -112,16 +122,16 @@ public class MovieItem  implements Parcelable {
     }
 
     @Override
-    public boolean equals(Object o){
-        if(o == null)
+    public boolean equals(Object o) {
+        if (o == null)
             return false;
-        if(!(o instanceof MovieItem))
+        if (!(o instanceof MovieItem))
             return false;
 
         MovieItem other = (MovieItem) o;
-        if(this.id!=null){
+        if (this.id != null) {
             return this.id.equals(other.id);
-        }else{
+        } else {
             return false;
         }
     }

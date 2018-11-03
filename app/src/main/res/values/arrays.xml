@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="pref_search_methods_options">
+        <item>@string/title_top_rated</item>
+        <item>@string/title_popular</item>
+        <item>@string/title_favorites</item>
+    </string-array>
+
+    <string-array name="pref_search_methods_values">
+        <item>@string/pref_search_top_rated</item>
+        <item>@string/pref_search_popular</item>
+        <item>@string/pref_search_favorite</item>
+    </string-array>
+</resources>

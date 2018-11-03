@@ -11,7 +11,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.WindowManager;
 
-import movies.smartzig.com.smartmovies.DiscoveryActivity;
+
 import movies.smartzig.com.smartmovies.R;
 
 public class MovieDetailActivity extends AppCompatActivity {
@@ -55,11 +55,7 @@ public class MovieDetailActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
-            Context context = this;
-            Class destinationClass = DiscoveryActivity.class;
-            Intent intentToStartDetailActivity = new Intent(context, destinationClass);
-            startActivity(intentToStartDetailActivity);
-           // onBackPressed();
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);

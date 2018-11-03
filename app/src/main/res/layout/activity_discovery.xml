@@ -43,6 +43,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom"
         android:background="@color/smartGreen"
-        app:menu="@menu/bottom_navigation" />
+        app:menu="@menu/discovery_bottom_navigation" />
 
 </FrameLayout>

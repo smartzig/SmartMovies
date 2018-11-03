@@ -1,17 +1,24 @@
 package movies.smartzig.com.smartmovies;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -21,31 +28,31 @@ import java.net.URL;
 import java.util.List;
 
 import movies.smartzig.com.smartmovies.MovieAdapter.MovieAdapterOnClickHandler;
-import movies.smartzig.com.smartmovies.data.AppPreferences;
+import movies.smartzig.com.smartmovies.data.MovieDbHelper;
 import movies.smartzig.com.smartmovies.details.MovieDetailActivity;
 import movies.smartzig.com.smartmovies.utils.MovieItem;
 import movies.smartzig.com.smartmovies.utils.MovieUtils;
 import movies.smartzig.com.smartmovies.utils.NetworkUtils;
 
 
-public class DiscoveryActivity extends AppCompatActivity implements MovieAdapterOnClickHandler {
+public class DiscoveryActivity extends AppCompatActivity implements MovieAdapterOnClickHandler, SharedPreferences.OnSharedPreferenceChangeListener {
 
-    private static final String SEARCH_TOP_RATED = "top_rated";
-    private static final String SEARCH_POPULAR = "popular";
-    private static final String SEARCH_FAVORITE = "favorite";
-
+    private final static String TAG = DiscoveryActivity.class.getSimpleName();
     private TextView mErrorMessageDisplay;
     private TextView mNoFavoriteMessageDisplay;
     private MovieAdapter mMovieAdapter;
     private RecyclerView mRecyclerView;
 
     private SharedPreferences mPrefs;
-    private static List<MovieItem> favoriteList;
+
 
     private ProgressBar mLoadingIndicator;
 
 
     private String searchTypeHandler;
+
+    private MovieDbHelper dbHelper;
+    private SQLiteDatabase mDb;
 
     @SuppressLint("RestrictedApi")
     @Override
@@ -58,9 +65,13 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
             getSupportActionBar().setBackgroundDrawable(new ColorDrawable(getResources().getColor(R.color.smartGreen)));
         }
 
-        mPrefs = getSharedPreferences(this.getResources().getString(R.string.pref_key), Context.MODE_PRIVATE);
-        favoriteList = MovieUtils.getFavoriteListFromPrefs(mPrefs);
+        // Create a DB helper (this will create the DB if run for the first time)
+        dbHelper = new MovieDbHelper(getApplicationContext());
 
+        // Keep a reference to the mDb until paused or killed. Get a writable database
+        mDb = dbHelper.getWritableDatabase();
+
+        setupSharedPreferences();
         /*
          * RecyclerView that will handle the movies list.
          */
@@ -98,25 +109,72 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
         /* Setting the adapter attaches it to the RecyclerView in our layout. */
         mRecyclerView.setAdapter(mMovieAdapter);
 
-        searchTypeHandler = AppPreferences.getPreferredSearchMethod();
-
-
         BottomNavigationView navigation = findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         refresh(searchTypeHandler);
-
     }
 
+
+    private void setupSharedPreferences() {
+
+        mPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        //favoriteList = MovieUtils.getFavoriteListFromPrefs(mPrefs);
+
+        searchTypeHandler = mPrefs.getString(this.getResources().getString(R.string.pref_search_key), this.getResources().getString(R.string.pref_default_search));
+
+        // Register the listener
+        mPrefs.registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_search_key))) {
+            searchTypeHandler = mPrefs.getString(this.getResources().getString(R.string.pref_search_key), this.getResources().getString(R.string.title_top_rated));
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        /* Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater */
+        MenuInflater inflater = getMenuInflater();
+        /* Use the inflater's inflate method to inflate our menu layout to this menu */
+        inflater.inflate(R.menu.discovery, menu);
+        /* Return true so that the menu is displayed in the Toolbar */
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            Intent startSettingsActivity = new Intent(this, SettingsActivity.class);
+            startActivity(startSettingsActivity);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     public void onResume() {
         super.onResume();
-        favoriteList = MovieUtils.getFavoriteListFromPrefs(mPrefs);
-
-        if (favoriteList.isEmpty()) {
+        if(searchTypeHandler.equals(this.getResources().getString(R.string.pref_search_favorite)))
+        {   //need to refresh favoritelist
             refresh(searchTypeHandler);
         }
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Unregister VisualizerActivity as an OnPreferenceChangedListener to avoid any memory leaks.
+        android.support.v7.preference.PreferenceManager.getDefaultSharedPreferences(this)
+                .unregisterOnSharedPreferenceChangeListener(this);
+
+        mDb.close();
     }
 
     /**
@@ -125,11 +183,13 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     private void refresh(String sortBy) {
         showMovieView();
 
-        if (sortBy.equals(SEARCH_FAVORITE)) {
-            handleMovieData(favoriteList);
+        if (sortBy.equals(this.getResources().getString(R.string.pref_search_favorite))) {
+
+            handleMovieData(dbHelper.fetchAllMovies(mDb));
         } else {
             new FetchMovieListTask().execute(sortBy);
         }
+
 
     }
 
@@ -156,19 +216,19 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
             switch (item.getItemId()) {
                 case R.id.navigation_top_rated:
 
-                    searchTypeHandler = SEARCH_TOP_RATED;
-                    refresh(SEARCH_TOP_RATED);
+                    searchTypeHandler = getResources().getString(R.string.pref_search_top_rated);
+                    refresh(searchTypeHandler);
                     return true;
 
                 case R.id.navigation_popular:
 
-                    searchTypeHandler = SEARCH_POPULAR;
-                    refresh(SEARCH_POPULAR);
+                    searchTypeHandler = getResources().getString(R.string.pref_search_popular);
+                    refresh(searchTypeHandler);
                     return true;
 
                 case R.id.navigation_favorite:
-                    searchTypeHandler = SEARCH_FAVORITE;
-                    refresh(SEARCH_FAVORITE);
+                    searchTypeHandler = getResources().getString(R.string.pref_search_favorite);
+                    refresh(searchTypeHandler);
                     return true;
             }
             return false;
@@ -179,13 +239,18 @@ public class DiscoveryActivity extends AppCompatActivity implements MovieAdapter
     private void handleMovieData(List<MovieItem> movieData) {
 
         mLoadingIndicator.setVisibility(View.INVISIBLE);
-        if (searchTypeHandler.equals(SEARCH_FAVORITE) && favoriteList.isEmpty()) {
-            showNoFavoriteMessage();
-        } else if (movieData != null) {
+
+        if (movieData != null && !movieData.isEmpty()) {
             showMovieView();
             mMovieAdapter.setMovieData(movieData);
         } else {
-            showErrorMessage();
+            if (searchTypeHandler.equals(getResources().getString(R.string.pref_search_favorite)))
+            {
+                showNoFavoriteMessage();
+            }else{
+                showErrorMessage();
+            }
+
         }
     }
 
