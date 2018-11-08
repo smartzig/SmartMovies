@@ -2,13 +2,18 @@ package movies.smartzig.com.smartmovies.details;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -18,10 +23,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.BindViews;
@@ -29,8 +37,11 @@ import butterknife.ButterKnife;
 import movies.smartzig.com.smartmovies.R;
 import movies.smartzig.com.smartmovies.data.MovieDbHelper;
 import movies.smartzig.com.smartmovies.utils.MovieItem;
+import movies.smartzig.com.smartmovies.utils.NetworkUtils;
 
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements
+        TrailerAdapter.OnItemClickListener, TrailersTask.Listener, ReviewsTask.Listener, ReviewAdapter.OnItemClickListener {
+
 
     private static final String LOG_TAG = MovieDetailFragment.class.getSimpleName();
     private static final String MOVIE_KEY = "MOVIE";
@@ -54,6 +65,15 @@ public class MovieDetailFragment extends Fragment {
 
     @BindViews({R.id.user_rating_first_star, R.id.user_rating_second_star, R.id.user_rating_third_star, R.id.user_rating_fourth_star, R.id.user_rating_fifth_star})
     List<ImageView> ratingStarViews;
+
+    public static final String EXTRA_TRAILERS = "EXTRA_TRAILERS";
+    public static final String EXTRA_REVIEWS = "EXTRA_REVIEWS";
+    @BindView(R.id.movie_trailer_list)
+    RecyclerView mRecyclerViewTrailers;
+    @BindView(R.id.review_list)
+    RecyclerView mRecyclerViewReviews;
+    private TrailerAdapter mTrailerListAdapter;
+    private ReviewAdapter mReviewAdapter;
 
     private MovieDbHelper dbHelper;
     private SQLiteDatabase mDb;
@@ -124,10 +144,110 @@ public class MovieDetailFragment extends Fragment {
                 .into(mMoviePosterView);
 
         refreshRatingStars();
+        loadTrailers(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_TRAILERS)) {
+            List<Trailers> trailers = savedInstanceState.getParcelableArrayList(EXTRA_TRAILERS);
+            mTrailerListAdapter.add(trailers);
 
+        } else {
+            getTrailers();
+        }
+
+
+        loadReviews(savedInstanceState);
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_REVIEWS)) {
+            List<Reviews> reviews = savedInstanceState.getParcelableArrayList(EXTRA_REVIEWS);
+            mReviewAdapter.add(reviews);
+        } else {
+            getReviews();
+        }
         Log.d(LOG_TAG, "Current selected movie id is: " + String.valueOf(mMovie.getId()));
 
         return rootView;
+    }
+
+
+    private void loadTrailers(Bundle savedInstanceState) {
+
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerViewTrailers.setLayoutManager(layoutManager);
+        mTrailerListAdapter = new TrailerAdapter(new ArrayList<Trailers>(), this);
+        mRecyclerViewTrailers.setAdapter(mTrailerListAdapter);
+        mRecyclerViewTrailers.setNestedScrollingEnabled(false);
+
+        //  Request for the trailers if only savedInstanceState == null
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_TRAILERS)) {
+            List<Trailers> trailers = savedInstanceState.getParcelableArrayList(EXTRA_TRAILERS);
+            mTrailerListAdapter.add(trailers);
+
+        } else {
+            getTrailers();
+        }
+    }
+
+    private void getTrailers() {
+        if (NetworkUtils.networkStatus(Objects.requireNonNull(getContext()))) {
+            TrailersTask task = new TrailersTask(MovieDetailFragment.this);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mMovie.getId());
+        } else {
+            Toast toast = Toast.makeText(getContext(), getString(R.string.message_network_alert), Toast.LENGTH_LONG);
+            toast.show();
+
+        }
+    }
+
+    private void loadReviews(Bundle savedInstanceState) {
+
+        LinearLayoutManager layoutManager
+                = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerViewReviews.setLayoutManager(layoutManager);
+        mReviewAdapter = new ReviewAdapter(new ArrayList<Reviews>(), this);
+        mRecyclerViewReviews.setAdapter(mReviewAdapter);
+        mRecyclerViewReviews.setNestedScrollingEnabled(false);
+
+
+        // Request for the reviews if only savedInstanceState == null
+        if (savedInstanceState != null && savedInstanceState.containsKey(EXTRA_REVIEWS)) {
+            List<Reviews> reviews = savedInstanceState.getParcelableArrayList(EXTRA_REVIEWS);
+            mReviewAdapter.add(reviews);
+        } else {
+            getReviews();
+        }
+    }
+
+    private void getReviews() {
+        if (NetworkUtils.networkStatus(Objects.requireNonNull(getContext()))) {
+            ReviewsTask task = new ReviewsTask(MovieDetailFragment.this);
+            task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, mMovie.getId());
+        }
+        //no need for a second alert message
+
+
+    }
+
+    @Override
+    public void onLoadFinished(List<Trailers> trailers) {
+        mTrailerListAdapter.add(trailers);
+
+
+    }
+
+    @Override
+    public void watch_trailer(Trailers trailers, int position) {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(trailers.getTrailerUrl())));
+    }
+
+    @Override
+    public void read_reviews(Reviews review, int position) {
+        startActivity(new Intent(Intent.ACTION_VIEW,
+                Uri.parse(review.getUrl())));
+    }
+
+    /*Implemented method from ReviewsTask Class*/
+    @Override
+    public void on_reviews_loaded(List<Reviews> reviews) {
+        mReviewAdapter.add(reviews);
     }
 
 

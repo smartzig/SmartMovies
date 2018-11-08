@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
-
 import java.util.List;
 
 import movies.smartzig.com.smartmovies.utils.MovieItem;
@@ -79,7 +78,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     }
 
 
-    public long insertMovie(SQLiteDatabase mDb, MovieItem movie) {
+    public void insertMovie(SQLiteDatabase mDb, MovieItem movie) {
         ContentValues cv = new ContentValues();
         cv.put(MovieContract.MovieEntry.COLUMN_ID, movie.getId());
         cv.put(MovieContract.MovieEntry.COLUMN_BACKDROP_PATH, movie.getBackdropPath());
@@ -90,10 +89,10 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         cv.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, movie.getReleaseDate());
 
 
-        return mDb.insert(MovieContract.MovieEntry.TABLE_NAME, null, cv);
+        mDb.insert(MovieContract.MovieEntry.TABLE_NAME, null, cv);
     }
 
-       public boolean deleteMovie(SQLiteDatabase mDb, long movieId) {
-        return mDb.delete(MovieContract.MovieEntry.TABLE_NAME, MovieContract.MovieEntry.COLUMN_ID + "=" + movieId, null) > 0;
+    public void deleteMovie(SQLiteDatabase mDb, long movieId) {
+        mDb.delete(MovieContract.MovieEntry.TABLE_NAME, MovieContract.MovieEntry.COLUMN_ID + "=" + movieId, null);
     }
 }

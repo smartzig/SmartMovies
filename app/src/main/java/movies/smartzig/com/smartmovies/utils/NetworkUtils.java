@@ -1,5 +1,8 @@
 package movies.smartzig.com.smartmovies.utils;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
@@ -30,7 +33,7 @@ public final class NetworkUtils {
     /* The language used to bring the results */
     private static final String language = "language";
     /* The api key that we use to authenticate the app */
-    private static final String apiKey = "INVALID KEY";
+    private static final String apiKey = "YOUR KEY HERE";
     /* The number of pages we want our API to return */
     private static final int pages = 1;
 
@@ -50,6 +53,23 @@ public final class NetworkUtils {
                 .appendQueryParameter(API_PARAM, apiKey)
                 .appendQueryParameter(LANGUAGE_PARAM, language)
                 .appendQueryParameter(PAGE_PARAM, Integer.toString(pages))
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
+    }
+
+    public static URL buildTrailerUrl(Long movieId) {
+        Uri builtUri = Uri.parse(BASE_URL + movieId + "/videos?").buildUpon()
+                .appendQueryParameter(API_PARAM, apiKey)
                 .build();
 
         URL url = null;
@@ -88,5 +108,30 @@ public final class NetworkUtils {
         } finally {
             urlConnection.disconnect();
         }
+    }
+
+    public static Boolean networkStatus(Context context) {
+        ConnectivityManager manager = (ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
+    }
+
+    public static URL buildReviewUrl(long movieId) {
+
+        Uri builtUri = Uri.parse(BASE_URL + movieId + "/reviews?").buildUpon()
+                .appendQueryParameter(API_PARAM, apiKey)
+                .build();
+
+        URL url = null;
+        try {
+            url = new URL(builtUri.toString());
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        Log.v(TAG, "Built URI " + url);
+
+        return url;
     }
 }

@@ -18,8 +18,16 @@
     <dimen name="button_height">36dp</dimen>
     <dimen name="button_horizontal_padding">16dp</dimen>
     <dimen name="button_vertical_padding">0dp</dimen>
+    <dimen name="button_vertical_margin">16dp</dimen>
 
+    <!--Trailer-->
+    <dimen name="trailer_list_vertical_padding">16dp</dimen>
+    <dimen name="trailer_width_for_detail">150dp</dimen>
+    <dimen name="trailer_height_for_detail">100dp</dimen>
 
-    <dimen name="movie_overview_padding_top">16dp</dimen>
+    <!--Reviews-->
+    <dimen name="detail_vertical_padding">8dp</dimen>
+    <dimen name="detail_horizontal_padding">16dp</dimen>
+
 
 </resources>

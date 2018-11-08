@@ -9,14 +9,16 @@
     <string name="title_favorites">Favorites</string>
 
     <string name="add_to_favorites">Add to Favorite</string>
-
-
+    <string name="watch_trailer">Trailers</string>
+    <string name="reviews_tittle">Reviews</string>
     <!--Rating-->
     <string name="movie_rating">Rating: %1$s/10</string>
 
 
+    <string name="message_network_alert">No Internet connection found, showing saved information.</string>
+
     <string name="error_message">
-        An error has occurred. Please try again by clicking REFRESH
+        An error has occurred. Please make sure you are connected to Internet. Or visit your favorite movie List.
     </string>
     <string name="original_tittle">Original tittle</string>
     <string name="poster">Poster</string>
@@ -40,5 +42,6 @@
     <string name="pref_search_key" translatable="false">SEARCH_METHOD</string>
 
     <string name="pref_search_label" translatable="false">Favorite Search Method</string>
+
 
 </resources>
