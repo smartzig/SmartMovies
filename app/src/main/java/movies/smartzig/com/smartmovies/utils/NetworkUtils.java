@@ -13,6 +13,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Scanner;
 
+import movies.smartzig.com.smartmovies.BuildConfig;
+
 public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
@@ -33,7 +35,7 @@ public final class NetworkUtils {
     /* The language used to bring the results */
     private static final String language = "language";
     /* The api key that we use to authenticate the app */
-    private static final String apiKey = "YOUR KEY HERE";
+    private static final String apiKey = BuildConfig.MdbApiKey;
     /* The number of pages we want our API to return */
     private static final int pages = 1;
 

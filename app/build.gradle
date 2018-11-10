@@ -13,6 +13,10 @@ android {
 
     }
     buildTypes {
+        debug {
+            buildConfigField 'String', "MdbApiKey", SmartMovies_MdbApiKey
+            //resValue 'string', "mdb_api_key", SmartMovies_MdbApiKey no need to access from res
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
